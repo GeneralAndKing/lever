@@ -148,4 +148,5 @@ public class SysUser extends BaseEntity<SysUser> implements UserDetails {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
     }
+
 }

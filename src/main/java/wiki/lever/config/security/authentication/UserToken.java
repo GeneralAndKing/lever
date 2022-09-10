@@ -1,10 +1,9 @@
-package wiki.lever.config.security;
+package wiki.lever.config.security.authentication;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import wiki.lever.config.security.JwtConfiguration;
 import wiki.lever.entity.SysUser;
-
-import java.util.Set;
 
 /**
  * Provide token information after user authentication. This is a necessary
@@ -42,13 +41,6 @@ public class UserToken {
      * @see SysUser#getUsername()
      */
     private String username;
-
-    /**
-     * User current roles name.
-     *
-     * @see SysUser#getAuthorities()
-     */
-    private Set<String> roles;
 
     /**
      * Unique authentication credentials used when users access resources,

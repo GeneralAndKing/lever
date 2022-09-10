@@ -1,4 +1,4 @@
-package wiki.lever.config.security;
+package wiki.lever.config.security.authentication;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
+import wiki.lever.config.security.SecurityConstant;
 import wiki.lever.modal.ErrorResponse;
 
 import java.io.IOException;

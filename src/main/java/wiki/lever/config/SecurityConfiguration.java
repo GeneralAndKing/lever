@@ -16,8 +16,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import wiki.lever.config.security.TokenAuthenticationEntryPoint;
-import wiki.lever.config.security.UsernamePasswordTokenAuthenticationFilter;
+import wiki.lever.config.security.authentication.TokenAuthenticationEntryPoint;
+import wiki.lever.config.security.authentication.UsernamePasswordTokenAuthenticationFilter;
+import wiki.lever.config.security.authorization.PermissionAuthorizationManager;
 
 import static wiki.lever.config.security.SecurityConstant.AUTHENTICATION_URL;
 
@@ -45,6 +46,8 @@ public class SecurityConfiguration {
      */
     private final AuthenticationConfiguration authenticationConfiguration;
 
+    private final PermissionAuthorizationManager permissionAuthorizationManager;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         UsernamePasswordTokenAuthenticationFilter authenticationFilter =
@@ -53,7 +56,7 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(authorize ->
                         authorize.antMatchers(HttpMethod.POST, AUTHENTICATION_URL).permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().access(permissionAuthorizationManager)
                 )
                 .csrf().disable()
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)

@@ -1,4 +1,4 @@
-package wiki.lever.config.security;
+package wiki.lever.config.security.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -10,9 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import wiki.lever.config.security.SecurityConstant;
 import wiki.lever.entity.SysUser;
 import wiki.lever.modal.ErrorResponse;
-import wiki.lever.service.AuthorizationService;
+import wiki.lever.service.AuthenticationService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,8 +29,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public final class UserAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-
-    private final AuthorizationService authorizationService;
+    private final AuthenticationService authenticationService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -40,7 +40,7 @@ public final class UserAuthenticationSuccessHandler implements AuthenticationSuc
             );
             return;
         }
-        UserToken userToken = authorizationService.buildToken(user);
+        UserToken userToken = authenticationService.buildToken(user);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         String responseBody = new ObjectMapper().writeValueAsString(userToken);

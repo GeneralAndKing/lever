@@ -1,4 +1,4 @@
-package wiki.lever.config.security;
+package wiki.lever.config.security.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

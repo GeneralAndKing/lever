@@ -1,4 +1,4 @@
-package wiki.lever.config.security;
+package wiki.lever.config.security.authentication;
 
 import wiki.lever.entity.SysUser;
 
@@ -15,6 +15,11 @@ public record UserTokenInfo(
         Set<String> roles
 ) {
 
+    /**
+     * Build user token info when user authentication.
+     *
+     * @return this token info
+     */
     public static UserTokenInfo buildTokenInfo(SysUser user) {
         return new UserTokenInfo(user.getName(), user.getUsername(), user.getRoleNames());
     }

@@ -35,7 +35,7 @@ public final class SecurityConstant {
      * @param errorResponse response body
      * @throws IOException if the convert fail
      */
-    static void buildResponse(HttpServletResponse response, HttpStatus httpStatus, ErrorResponse errorResponse) throws IOException {
+    public static void buildResponse(HttpServletResponse response, HttpStatus httpStatus, ErrorResponse errorResponse) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(httpStatus.value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

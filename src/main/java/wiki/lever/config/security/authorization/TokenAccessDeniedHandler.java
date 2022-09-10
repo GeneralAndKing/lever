@@ -1,4 +1,4 @@
-package wiki.lever.config.security;
+package wiki.lever.config.security.authorization;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

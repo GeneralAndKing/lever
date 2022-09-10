@@ -9,11 +9,11 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
-import wiki.lever.config.security.UserToken;
-import wiki.lever.config.security.UserTokenInfo;
+import wiki.lever.config.security.authentication.UserToken;
+import wiki.lever.config.security.authentication.UserTokenInfo;
 import wiki.lever.entity.SysUser;
 import wiki.lever.repository.SysUserRepository;
-import wiki.lever.service.AuthorizationService;
+import wiki.lever.service.AuthenticationService;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -25,7 +25,7 @@ import java.time.temporal.ChronoUnit;
  */
 @Service
 @RequiredArgsConstructor
-public class AuthorizationServiceImpl implements AuthorizationService {
+public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final SysUserRepository sysUserRepository;
     private final JwtEncoder jwtEncoder;
@@ -48,8 +48,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                 .setAccessToken(buildUserAccessToken(user))
                 .setRefreshToken(buildUserRefreshToken(user))
                 .setSubject(user.getName())
-                .setUsername(user.getUsername())
-                .setRoles(user.getRoleNames());
+                .setUsername(user.getUsername());
     }
 
     public String buildUserAccessToken(SysUser user) {
