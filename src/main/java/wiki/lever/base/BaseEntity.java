@@ -46,7 +46,6 @@ public class BaseEntity<E extends BaseEntity<E>> {
     /**
      * Create time
      */
-    @CreatedBy
     @CreatedDate
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL")
     private LocalDateTime createTime;
@@ -54,13 +53,13 @@ public class BaseEntity<E extends BaseEntity<E>> {
     /**
      * Create user name
      */
+    @CreatedBy
     @Comment("Create user name")
     private String createUser;
 
     /**
      * Update time
      */
-    @LastModifiedBy
     @LastModifiedDate
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updateTime;
@@ -68,6 +67,7 @@ public class BaseEntity<E extends BaseEntity<E>> {
     /**
      * Update user name
      */
+    @LastModifiedBy
     @Comment("Update user name")
     private String updateUser;
 

@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 @ToString(callSuper = true)
 @Table(name = "sys_user")
 @Where(clause = "deleted = false")
+@EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE sys_user SET deleted=true WHERE id=?")
 public class SysUser extends BaseEntity<SysUser> implements UserDetails {
 

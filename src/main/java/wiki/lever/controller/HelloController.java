@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import wiki.lever.entity.SysUser;
+import wiki.lever.modal.annotation.Log;
 import wiki.lever.repository.SysUserRepository;
-
-import java.util.List;
 
 /**
  * 2022/08/31 17:13:12
@@ -22,9 +21,15 @@ public class HelloController {
     private final SysUserRepository sysUserRepository;
 
     @GetMapping("/hello")
-    public HttpEntity<List<SysUser>> hello() {
-        List<SysUser> all = sysUserRepository.findAll();
-        return ResponseEntity.ok(all);
+    @Log(operateModule = "业务", operateType = "测试", operateName = "你好")
+    public HttpEntity<?> hello(String param1, int param2) {
+        return ResponseEntity.ok(sysUserRepository.findAll());
+    }
+
+    @PostMapping("/word")
+    @Log(operateModule = "业务", operateType = "测试", operateName = "世界")
+    public HttpEntity<?> word() {
+        return ResponseEntity.ok(sysUserRepository.findAll());
     }
 
 }

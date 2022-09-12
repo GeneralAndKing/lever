@@ -12,7 +12,7 @@ import wiki.lever.modal.exception.SystemException;
  * @author yue
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class JacksonUtils {
+public class JacksonUtil {
 
     /**
      * Wrap Jackson exception to {@link SystemException}.

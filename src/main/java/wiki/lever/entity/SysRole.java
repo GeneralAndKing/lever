@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import wiki.lever.base.BaseEntity;
@@ -31,6 +32,7 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Table(name = "sys_role")
 @Where(clause = "deleted = false")
+@EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE sys_role SET deleted=true WHERE id=?")
 public class SysRole extends BaseEntity<SysRole> {
 
