@@ -14,6 +14,12 @@ import wiki.lever.modal.exception.SystemException;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JacksonUtils {
 
+    /**
+     * Wrap Jackson exception to {@link SystemException}.
+     *
+     * @param obj java object
+     * @return json string
+     */
     public static String toJson(Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);

@@ -47,7 +47,7 @@ public class JwtConfiguration {
     }
 
     /**
-     * <img src="https://docs.spring.io/spring-security/reference/6.0.0-M6/_images/servlet/oauth2/jwtauthenticationprovider.png" alt="JwtAuthenticationProvider Usage" />
+     * Decode user info from Jwt token.
      *
      * @return Jwt decoder
      * @throws JOSEException {@link RSAKey#toRSAPublicKey()} throws reason.

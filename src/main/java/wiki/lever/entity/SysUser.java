@@ -1,6 +1,6 @@
 package wiki.lever.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,15 +9,13 @@ import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import wiki.lever.base.BaseEntity;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -74,13 +72,21 @@ public class SysUser extends BaseEntity<SysUser> implements UserDetails {
      * Associated roles
      */
     @ToString.Exclude
-    @JsonIgnoreProperties("users")
+    @JsonManagedReference
     @ManyToMany(targetEntity = SysRole.class, cascade = CascadeType.ALL)
     @JoinTable(name = "sys_user_role",
             joinColumns = {@JoinColumn(name = "sys_user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "sys_role_id", referencedColumnName = "id")}
     )
     private Set<SysRole> roles = new HashSet<>();
+
+    /**
+     * Current permissions. It will be wrapped in {@link wiki.lever.config.security.authentication.UserTokenInfo}.
+     *
+     * @see wiki.lever.service.AuthenticationService#buildToken(SysUser) set this field
+     * @see wiki.lever.config.security.authorization.PermissionAuthorizationManager get this field
+     */
+    private transient Map<HttpMethod, List<String>> permissions = Collections.emptyMap();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

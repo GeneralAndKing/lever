@@ -1,7 +1,11 @@
 package wiki.lever.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,6 +15,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.http.HttpMethod;
 import wiki.lever.base.BaseEntity;
+import wiki.lever.entity.serialize.HttpMethodSerialize;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -38,6 +43,7 @@ public class SysPermission extends BaseEntity<SysPermission> {
      * Request method.
      */
     @Column(length = 55)
+    @JsonSerialize(using = HttpMethodSerialize.class)
     private HttpMethod method;
 
     /**
@@ -49,7 +55,7 @@ public class SysPermission extends BaseEntity<SysPermission> {
      * Associated roles.
      */
     @ToString.Exclude
-    @JsonIgnoreProperties({"roles"})
+    @JsonBackReference
     @ManyToMany(mappedBy = "permissions")
     private Set<SysRole> roles = new HashSet<>();
 

@@ -1,7 +1,7 @@
 package wiki.lever.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import wiki.lever.base.BaseRepository;
 import wiki.lever.entity.SysUser;
 
 import java.util.Optional;
@@ -12,7 +12,7 @@ import java.util.Optional;
  * @author yue
  */
 @Repository
-public interface SysUserRepository extends JpaRepository<SysUser, Long> {
+public interface SysUserRepository extends BaseRepository<SysUser> {
 
     /**
      * Find user by username.

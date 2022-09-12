@@ -5,5 +5,5 @@ pluginManagement {
   }
 }
 
-rootProject.name = "lever-spring-boot-3"
+rootProject.name = "lever"
 

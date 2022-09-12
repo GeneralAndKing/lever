@@ -1,7 +1,7 @@
 package wiki.lever.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import wiki.lever.base.BaseRepository;
 import wiki.lever.entity.SysRole;
 
 /**
@@ -10,5 +10,5 @@ import wiki.lever.entity.SysRole;
  * @author yue
  */
 @Repository
-public interface SysRoleRepository extends JpaRepository<SysRole, Long> {
+public interface SysRoleRepository extends BaseRepository<SysRole> {
 }

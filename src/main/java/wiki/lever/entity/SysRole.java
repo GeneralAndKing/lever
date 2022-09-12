@@ -1,6 +1,7 @@
 package wiki.lever.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +38,7 @@ public class SysRole extends BaseEntity<SysRole> {
      * 子对象
      */
     @ToString.Exclude
-    @JsonIgnoreProperties({"users", "parent", "children", "permissions"})
+    @JsonBackReference
     @OneToMany(mappedBy = "parent")
     private Set<SysRole> children;
 
@@ -46,7 +47,7 @@ public class SysRole extends BaseEntity<SysRole> {
      */
     @ManyToOne
     @ToString.Exclude
-    @JsonIgnoreProperties({"users", "parent", "children", "permissions"})
+    @JsonManagedReference
     @JoinColumn(name = "parent_id")
     private SysRole parent;
 
@@ -55,7 +56,7 @@ public class SysRole extends BaseEntity<SysRole> {
      * Associated users.
      */
     @ToString.Exclude
-    @JsonIgnoreProperties("roles")
+    @JsonBackReference
     @ManyToMany(mappedBy = "roles")
     private Set<SysUser> users = new HashSet<>();
 
@@ -64,7 +65,7 @@ public class SysRole extends BaseEntity<SysRole> {
      * Associated permissions.
      */
     @ToString.Exclude
-    @JsonIgnoreProperties("roles")
+    @JsonManagedReference
     @ManyToMany(targetEntity = SysPermission.class, cascade = CascadeType.ALL)
     @JoinTable(name = "sys_role_permission",
             joinColumns = {@JoinColumn(name = "sys_role_id", referencedColumnName = "id")},
