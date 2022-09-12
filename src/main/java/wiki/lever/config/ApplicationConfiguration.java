@@ -6,10 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.Optional;
 
@@ -19,7 +18,7 @@ import java.util.Optional;
  * @author yue
  */
 @Configuration
-@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
+@EnableJpaAuditing
 @RequiredArgsConstructor
 public class ApplicationConfiguration {
 
@@ -31,19 +30,13 @@ public class ApplicationConfiguration {
      * @return bean
      */
     @Bean
-    JPAQueryFactory jpaQuery() {
+    JPAQueryFactory jpaQuery(JpaContext jpaContext) {
         return new JPAQueryFactory(entityManager);
     }
 
 
     @Bean
     AuditorAware<String> auditorProvider() {
-        return ()-> {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
-                return Optional.of(jwtAuthenticationToken.getName());
-            }
-            return Optional.empty();
-        };
+        return ()-> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 }
