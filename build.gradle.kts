@@ -31,6 +31,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.apache.commons:commons-lang3")
+  implementation("org.apache.commons:commons-collections4:4.4")
   implementation(group = "com.querydsl", name = "querydsl-jpa", classifier = "jakarta")
   compileOnly("org.projectlombok:lombok")
   developmentOnly("org.springframework.boot:spring-boot-devtools")

@@ -6,10 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -30,13 +31,19 @@ public class ApplicationConfiguration {
      * @return bean
      */
     @Bean
-    JPAQueryFactory jpaQuery(JpaContext jpaContext) {
+    JPAQueryFactory jpaQuery() {
         return new JPAQueryFactory(entityManager);
     }
 
 
     @Bean
     AuditorAware<String> auditorProvider() {
-        return ()-> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication().getName());
+        return () -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (Objects.isNull(authentication)) {
+                return Optional.of("anonymous");
+            }
+            return Optional.ofNullable(authentication.getName());
+        };
     }
 }

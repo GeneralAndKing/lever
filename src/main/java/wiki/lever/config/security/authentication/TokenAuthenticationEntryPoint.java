@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.server.resource.BearerTokenError;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
 import wiki.lever.config.security.SecurityConstant;
 import wiki.lever.modal.ErrorResponse;
 
@@ -24,6 +25,7 @@ import java.io.IOException;
  *
  * @author yue
  */
+@Component
 public final class TokenAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override

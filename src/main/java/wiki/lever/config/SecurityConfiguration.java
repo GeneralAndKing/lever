@@ -7,11 +7,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -19,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import wiki.lever.config.security.authentication.TokenAuthenticationEntryPoint;
 import wiki.lever.config.security.authentication.UsernamePasswordTokenAuthenticationFilter;
 import wiki.lever.config.security.authorization.PermissionAuthorizationManager;
+import wiki.lever.config.security.authorization.TokenAccessDeniedHandler;
 
 import static wiki.lever.config.security.SecurityConstant.AUTHENTICATION_URL;
 
@@ -53,6 +52,8 @@ public class SecurityConfiguration {
         UsernamePasswordTokenAuthenticationFilter authenticationFilter =
                 new UsernamePasswordTokenAuthenticationFilter(authenticationSuccessHandler, authenticationFailureHandler);
         authenticationFilter.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
+        TokenAuthenticationEntryPoint authenticationEntryPoint = new TokenAuthenticationEntryPoint();
+        TokenAccessDeniedHandler accessDeniedHandler = new TokenAccessDeniedHandler();
         return http
                 .authorizeHttpRequests(authorize ->
                         authorize.antMatchers(HttpMethod.POST, AUTHENTICATION_URL).permitAll()
@@ -60,12 +61,11 @@ public class SecurityConfiguration {
                 )
                 .csrf().disable()
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .oauth2ResourceServer(config -> config.authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                        .jwt())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(new TokenAuthenticationEntryPoint())
-                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
-                ).build();
+                .build();
     }
 
 

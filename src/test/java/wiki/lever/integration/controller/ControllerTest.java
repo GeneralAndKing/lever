@@ -5,7 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
 import wiki.lever.entity.SysLog;
-import wiki.lever.integration.DataSourceTestExecutionListener;
+import wiki.lever.integration.DataSourceInitializeListener;
+import wiki.lever.integration.DatasourceMockData;
 import wiki.lever.repository.SysLogRepository;
 
 import java.util.List;
@@ -17,9 +18,10 @@ import java.util.List;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestExecutionListeners(
-        listeners = DataSourceTestExecutionListener.class,
+        listeners = DataSourceInitializeListener.class,
         mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
 )
+@DatasourceMockData
 class ControllerTest {
 
     @Autowired

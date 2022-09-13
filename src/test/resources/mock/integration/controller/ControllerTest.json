@@ -1,0 +1,16 @@
+[
+  {
+    "method": "userTest",
+    "data": [
+      {
+        "entity": "wiki.lever.entity.SysLog",
+        "data": [
+          {
+            "id": 1,
+            "name": "hello"
+          }
+        ]
+      }
+    ]
+  }
+]
