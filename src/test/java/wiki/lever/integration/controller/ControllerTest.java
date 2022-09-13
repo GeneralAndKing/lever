@@ -11,6 +11,8 @@ import wiki.lever.repository.SysLogRepository;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * 2022/9/12 22:52:12
  *
@@ -28,8 +30,8 @@ class ControllerTest {
     private SysLogRepository sysLogRepository;
 
     @Test
-    void userTest() {
+    void logTest() {
         List<SysLog> all = sysLogRepository.findAll();
-        System.out.println(all);
+        assertEquals(1, all.size());
     }
 }

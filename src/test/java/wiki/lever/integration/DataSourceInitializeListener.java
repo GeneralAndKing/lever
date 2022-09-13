@@ -7,9 +7,9 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.repository.support.Repositories;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.testcontainers.containers.GenericContainer;
@@ -43,6 +43,8 @@ record DatasourceData(String method, List<DatasourceRepository> data) {
 }
 
 /**
+ * Init mock data when test run.
+ * <p>
  * 2022/9/12 22:19:57
  *
  * @author yue
@@ -52,26 +54,22 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
 
     private final RedisContainer redisContainer = new RedisContainer().withExposedPorts(6379);
 
-    private final JdbcDatabaseContainer<?> mysqlContainer = new MySQLContainerProvider()
+    private final JdbcDatabaseContainer<?> datasourceContainer = new MySQLContainerProvider()
             .newInstance("latest");
 
     private final static String MOCK_DATA_FILE_SUFFIX = ".json";
 
-    private Repositories repositories;
-
     @Override
     public void beforeTestClass(@NotNull TestContext testContext) {
         redisContainer.start();
-        mysqlContainer.start();
-        log.info("[integration] Mysql container init in {}:{}", mysqlContainer.getHost(), mysqlContainer.getFirstMappedPort());
+        datasourceContainer.start();
+        log.info("[integration] Mysql container init in {}:{}", datasourceContainer.getHost(), datasourceContainer.getFirstMappedPort());
         log.info("[integration] Redis container init in {}:{}", redisContainer.getHost(), redisContainer.getFirstMappedPort());
         System.getProperties().setProperty("spring.redis.port", redisContainer.getFirstMappedPort().toString());
         System.getProperties().setProperty("spring.redis.host", redisContainer.getHost());
-        System.getProperties().setProperty("spring.datasource.url", mysqlContainer.getJdbcUrl());
-        System.getProperties().setProperty("spring.datasource.username", mysqlContainer.getUsername());
-        System.getProperties().setProperty("spring.datasource.password", mysqlContainer.getPassword());
-        repositories = new Repositories(testContext.getApplicationContext());
-        ;
+        System.getProperties().setProperty("spring.datasource.url", datasourceContainer.getJdbcUrl());
+        System.getProperties().setProperty("spring.datasource.username", datasourceContainer.getUsername());
+        System.getProperties().setProperty("spring.datasource.password", datasourceContainer.getPassword());
     }
 
     @Override
@@ -96,7 +94,7 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
             }
             List<DatasourceRepository> datasourceRepositories = datasourceData.data();
             for (DatasourceRepository datasourceRepository : datasourceRepositories) {
-                initData(datasourceRepository);
+                initData(testContext.getApplicationContext(), datasourceRepository);
             }
         } catch (FileNotFoundException e) {
             log.warn("[Init mock] Can not find mock file {}. {}", mockDataFilePath, e);
@@ -113,14 +111,15 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
      * second, load and parse data from json file and convert to list,
      * last, {@link BaseRepository#saveAll(Iterable)} data.
      *
+     * @param applicationContext   spring application context
      * @param datasourceRepository mock datasource repository
      * @throws ClassNotFoundException  can not find entity class
      * @throws JsonProcessingException can not parse json string
      */
-    private void initData(DatasourceRepository datasourceRepository) throws ClassNotFoundException, JsonProcessingException {
+    private void initData(ApplicationContext applicationContext, DatasourceRepository datasourceRepository) throws ClassNotFoundException, JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Class<?> entityClass = Class.forName(datasourceRepository.entity());
-        Optional<Object> repositoryFor = repositories.getRepositoryFor(entityClass);
+        Optional<Object> repositoryFor = new Repositories(applicationContext).getRepositoryFor(entityClass);
         if (repositoryFor.isEmpty()) {
             log.warn("[Init mock] Mock datasource type can not find repository of {}.", entityClass);
             return;
@@ -185,7 +184,14 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
 
     @Override
     public void afterTestMethod(@NotNull TestContext testContext) {
-
+        ApplicationContext applicationContext = testContext.getApplicationContext();
+        String[] repositoryNames = applicationContext.getBeanNamesForType(BaseRepository.class);
+        // Clear all tables data.
+        for (String repositoryName : repositoryNames) {
+            BaseRepository<?> repository = applicationContext.getBean(repositoryName, BaseRepository.class);
+            repository.deleteAllInBatch();
+            log.info("[After mock] Clear table data of {}.", repositoryName);
+        }
     }
 
     @Override
@@ -194,8 +200,8 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
         if (redisContainer.isRunning()) {
             redisContainer.stop();
         }
-        if (mysqlContainer.isRunning()) {
-            mysqlContainer.stop();
+        if (datasourceContainer.isRunning()) {
+            datasourceContainer.stop();
         }
     }
 }
