@@ -17,8 +17,9 @@ configurations {
 }
 
 repositories {
-  mavenCentral()
+  maven { url = uri("https://maven.aliyun.com/nexus/content/groups/public/") }
   maven { url = uri("https://repo.spring.io/milestone") }
+  mavenCentral()
 }
 
 val testcontainersVersion by extra { "1.17.3" }
