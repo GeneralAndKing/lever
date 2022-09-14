@@ -13,7 +13,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import wiki.lever.entity.SysLog;
 import wiki.lever.modal.ErrorResponse;
 import wiki.lever.modal.annotation.Log;
-import wiki.lever.repository.SysLogRepository;
+import wiki.lever.service.SysLogService;
 import wiki.lever.util.JacksonUtil;
 import wiki.lever.util.RequestUtil;
 
@@ -29,7 +29,7 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class LogAspect {
-    private final SysLogRepository sysLogRepository;
+    private final SysLogService sysLogService;
 
     @Around("@annotation(operateLog)")
     public Object around(ProceedingJoinPoint joinPoint, Log operateLog) throws Throwable {
@@ -42,7 +42,7 @@ public class LogAspect {
         } catch (Exception e) {
             sysLog.setResult(JacksonUtil.toJson(new ErrorResponse(e)));
         }
-        sysLogRepository.save(sysLog);
+        sysLogService.save(sysLog);
         return result;
     }
 
