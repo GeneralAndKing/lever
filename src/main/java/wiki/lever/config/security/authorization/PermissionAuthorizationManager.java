@@ -44,7 +44,7 @@ public class PermissionAuthorizationManager implements AuthorizationManager<Requ
         // It must be Jwt.
         Jwt principal = (Jwt) jwtAuthenticationToken.getPrincipal();
         log.info("Access user {}.", principal.getSubject());
-        UserTokenInfo detail = UserTokenInfo.fromJsonObject(principal.getClaim("detail"));
+        UserTokenInfo detail = UserTokenInfo.fromMap(principal.getClaims());
         return new AuthorizationDecision(check(requestAuthorizationContext, detail));
     }
 

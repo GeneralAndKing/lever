@@ -1,5 +1,6 @@
 package wiki.lever.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import wiki.lever.config.security.JwtProperties;
 import wiki.lever.config.security.authentication.UserToken;
 import wiki.lever.config.security.authentication.UserTokenInfo;
 import wiki.lever.entity.QSysPermission;
@@ -20,9 +22,9 @@ import wiki.lever.repository.SysUserRepository;
 import wiki.lever.service.AuthenticationService;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,8 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final SysUserRepository sysUserRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final JwtEncoder jwtEncoder;
-    private static final int DEFAULT_ACCESS_TOKEN_HOURS = 12;
-    private static final int DEFAULT_REFRESH_TOKEN_HOURS = 24 * 7;
+    private final JwtProperties jwtProperties;
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -81,26 +82,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public String buildUserAccessToken(SysUser user) {
         Instant now = Instant.now();
-        Instant expires = now.plus(DEFAULT_ACCESS_TOKEN_HOURS, ChronoUnit.HOURS);
-        UserTokenInfo userTokenInfo = buildTokenInfo(user);
+        Instant expires = now.plus(jwtProperties.getAccessTokenExpiresTime(), jwtProperties.getAccessTokenExpiresUnit());
         JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
                 .subject(user.getName())
-                .issuer("lever")
+                .issuer(jwtProperties.getIssuer())
                 .issuedAt(now)
                 .expiresAt(expires)
                 .notBefore(now)
                 .id(user.getName())
-                .claim("detail", userTokenInfo)
+                .claims(claim -> claim.putAll(buildTokenInfo(user)))
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
     }
 
     private String buildUserRefreshToken(SysUser user) {
         Instant now = Instant.now();
-        Instant expires = now.plus(DEFAULT_REFRESH_TOKEN_HOURS, ChronoUnit.HOURS);
+        Instant expires = now.plus(jwtProperties.getRefreshTokenExpiresTime(), jwtProperties.getRefreshTokenExpiresUnit());
         JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
                 .subject(user.getName())
-                .issuer("lever")
+                .issuer(jwtProperties.getIssuer())
                 .issuedAt(now)
                 .expiresAt(expires)
                 .notBefore(now)
@@ -114,12 +114,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      *
      * @return this token info
      */
-    private UserTokenInfo buildTokenInfo(SysUser user) {
+    @SuppressWarnings("unchecked")
+    private Map<String, Objects> buildTokenInfo(SysUser user) {
         Set<String> roleNames = user.getRoleNames();
-        return new UserTokenInfo()
+        UserTokenInfo userTokenInfo = new UserTokenInfo()
                 .setSubject(user.getName())
                 .setUsername(user.getUsername())
                 .setRoles(roleNames)
                 .setPermissions(user.getPermissions());
+        return new ObjectMapper().convertValue(userTokenInfo, Map.class);
     }
 }

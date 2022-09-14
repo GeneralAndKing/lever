@@ -1,7 +1,8 @@
 package wiki.lever.config.security.authentication;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,6 @@ import lombok.experimental.Accessors;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.jwt.Jwt;
 import wiki.lever.entity.SysUser;
-import wiki.lever.modal.exception.SystemException;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +28,7 @@ import java.util.Set;
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserTokenInfo {
 
     /**
@@ -64,15 +65,12 @@ public class UserTokenInfo {
      * {@link Jwt#getClaim(String)} method he provided can only obtain the basic type,
      * and the rest will be converted into JSONObject, so it needs to be converted manually.
      *
-     * @param jsonObject claim information
+     * @param map claim information
      * @return token info
      */
-    public static UserTokenInfo fromJsonObject(JSONObject jsonObject) {
-        try {
-            return new ObjectMapper().readValue(jsonObject.toJSONString(), UserTokenInfo.class);
-        } catch (JsonProcessingException e) {
-            throw new SystemException(e);
-        }
+    public static UserTokenInfo fromMap(Map<String, Object> map) {
+        return new ObjectMapper().registerModule(new JavaTimeModule())
+                .convertValue(map, UserTokenInfo.class);
     }
 
 }
