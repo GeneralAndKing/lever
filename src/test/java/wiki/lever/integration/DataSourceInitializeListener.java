@@ -92,6 +92,7 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
                 log.warn("[Init mock] {} do not have mock data.", testMethod.getName());
                 return;
             }
+            log.info("[Init mock] {} success init mock data.", testMethod.getName());
             List<DatasourceRepository> datasourceRepositories = datasourceData.data();
             for (DatasourceRepository datasourceRepository : datasourceRepositories) {
                 initData(testContext.getApplicationContext(), datasourceRepository);

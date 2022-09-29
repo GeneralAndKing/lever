@@ -1,6 +1,7 @@
 package wiki.lever.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,6 +32,7 @@ import java.util.Set;
 @Where(clause = "deleted = false")
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE sys_permission SET deleted=true WHERE id=?")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SysPermission extends BaseEntity<SysPermission> {
 
     /**
@@ -54,7 +56,6 @@ public class SysPermission extends BaseEntity<SysPermission> {
      * Associated roles.
      */
     @ToString.Exclude
-    @JsonBackReference
     @ManyToMany(mappedBy = "permissions")
     private Set<SysRole> roles = new HashSet<>();
 

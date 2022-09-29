@@ -1,6 +1,7 @@
 package wiki.lever.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 @Where(clause = "deleted = false")
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE sys_user SET deleted=true WHERE id=?")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SysUser extends BaseEntity<SysUser> implements UserDetails {
 
     /**
@@ -58,7 +60,7 @@ public class SysUser extends BaseEntity<SysUser> implements UserDetails {
     /**
      * User account is expired.
      */
-    private LocalDateTime expiredTime = LocalDateTime.MAX;
+    private LocalDateTime expiredTime = LocalDateTime.now().plusYears(1);
 
     /**
      * User account is locked.
@@ -74,7 +76,6 @@ public class SysUser extends BaseEntity<SysUser> implements UserDetails {
      * Associated roles
      */
     @ToString.Exclude
-    @JsonManagedReference
     @ManyToMany(targetEntity = SysRole.class, cascade = CascadeType.ALL)
     @JoinTable(name = "sys_user_role",
             joinColumns = {@JoinColumn(name = "sys_user_id", referencedColumnName = "id")},

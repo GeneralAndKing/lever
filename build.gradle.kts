@@ -2,7 +2,8 @@ plugins {
   idea
   id("java")
   id("io.spring.dependency-management") version "1.0.13.RELEASE"
-  id("org.springframework.boot") version "3.0.0-M4"
+  id("org.springframework.boot") version "3.0.0-M5"
+  id("org.asciidoctor.jvm.convert") version "3.3.2"
 }
 
 group = "wiki.lever"
@@ -22,7 +23,10 @@ repositories {
   mavenCentral()
 }
 
+val asciidoctorExtensions: Configuration by configurations.creating
 val testcontainersVersion by extra { "1.17.3" }
+val snippetsDir by extra { file("build/generated-snippets") }
+extra["snippetsDir"] = file("build/generated-snippets")
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -37,6 +41,7 @@ dependencies {
   compileOnly("org.projectlombok:lombok")
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   runtimeOnly("mysql:mysql-connector-java")
+  asciidoctorExtensions("org.springframework.restdocs:spring-restdocs-asciidoctor")
   annotationProcessor(
     group = "com.querydsl", name = "querydsl-apt", classifier = "jakarta"
   )
@@ -47,6 +52,7 @@ dependencies {
   testAnnotationProcessor("org.projectlombok:lombok")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
+  testImplementation("org.springframework.restdocs:spring-restdocs-restassured")
   testImplementation("org.testcontainers:junit-jupiter")
   testImplementation("org.testcontainers:mysql")
 }
@@ -59,4 +65,29 @@ dependencyManagement {
 
 tasks.getByName<Test>("test") {
   useJUnitPlatform()
+}
+
+tasks.test {
+  outputs.dir(snippetsDir)
+}
+
+// https://github.com/spring-io/start.spring.io/issues/676#issuecomment-859641317
+tasks.asciidoctor {
+  dependsOn(tasks.withType<Test>())
+  inputs.dir(snippetsDir)
+  configurations(asciidoctorExtensions.name)
+  attributes(
+    mapOf("snippets" to snippetsDir)
+  )
+}
+
+tasks.register<Copy>("apiDocument") {
+  group = "documentation"
+  from(tasks.asciidoctor.get().outputDir)
+  into("src/main/resources/static/docs")
+}
+
+tasks.bootJar {
+  dependsOn(tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask>())
+  dependsOn(tasks.withType<Copy>())
 }

@@ -3,7 +3,6 @@ package wiki.lever.config.security.authentication;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.nimbusds.jose.shaded.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -61,7 +60,7 @@ public class UserTokenInfo {
     private Map<HttpMethod, List<String>> permissions = Collections.emptyMap();
 
     /**
-     * Build token info from {@link JSONObject}.
+     * Build token info from {@code JSONObject}.
      * {@link Jwt#getClaim(String)} method he provided can only obtain the basic type,
      * and the rest will be converted into JSONObject, so it needs to be converted manually.
      *
