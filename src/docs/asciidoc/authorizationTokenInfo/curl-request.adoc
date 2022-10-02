@@ -1,0 +1,10 @@
+- url: `'http://localhost:55771/authorization/tokenInfo'`
+
+
+[source,bash]
+----
+$ curl 'http://localhost:55771/authorization/tokenInfo' -i -X GET \
+    -H 'Accept: application/json, application/javascript, text/javascript, text/json' \
+    -H 'Authorization: Bearer eyJraWQiOiIzYzhmMjM5MS04YzM0LTRjYjQtOWYwNy0xMWQ5M2M3ZWI2MzUiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzdWJqZWN0IiwibmJmIjoxNjY0NzI4MjMzLCJzdWJqZWN0Ijoic3ViamVjdCIsInBlcm1pc3Npb25zIjp7IkdFVCI6WyIvYXV0aG9yaXphdGlvbi90b2tlbkluZm8iXX0sInJvbGVzIjpbIlBVQkxJQyJdLCJpc3MiOiJsZXZlciIsImV4cCI6MTY2NDc3MTQzMywiaWF0IjoxNjY0NzI4MjMzLCJqdGkiOiJzdWJqZWN0IiwidXNlcm5hbWUiOiJhZG1pbiJ9.Behdg5e-qF7nL8kdoSiBOxwyN3aZEs3ZzRRE8Mhi7jY6pi8WuUYs_VR8CJs34lXVVkD5Slx80x2v-9rJEymO7sschauC-Z4u3fWo85dhwK1fopKD5qT3w9mJJnRUmvUSRSDrvYevt42sYgZd8m-fmh_jVyP402tw7YLHqu_XVN_6ILPMjRkL9XGfZzH2qsQeChQBc9GFauSHR4NkNUhSCVOF2jROGcsVQJu_bdlRTq3wzoos_LR1BfsNiF6Yw0N5XpKzhnHhR3s0CWutlfCRuZRineHel-xj313HaSJKwy57NNNJSmdknNCp9jPTLk1_lgY4yMQDip9xgpSyv8yvog' \
+    -H 'Content-Type: application/json'
+----

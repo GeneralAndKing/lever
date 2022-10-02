@@ -1,0 +1,25 @@
+[%autowidth.stretch,stripes=hover]
+|===
+|Path|Type|Description
+
+|`+subject+`
+|`+String+`
+|User unique identification.
+
+|`+username+`
+|`+String+`
+|Login user name.
+
+|`+roles+`
+|`+Array+`
+|User current roles array.
+
+|`+permissions+`
+|`+Object+`
+|User roles' permissions. Has `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.
+
+|`+permissions.*+`
+|`+Array+`
+|Current method path array.
+
+|===

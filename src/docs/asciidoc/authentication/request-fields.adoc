@@ -1,0 +1,17 @@
+[%autowidth.stretch,stripes=hover]
+|===
+|Path|Type|Description|Constraints|Require
+
+|`+username+`
+|`+String+`
+|Login user name.
+|
+|`+true+`
+
+|`+password+`
+|`+String+`
+|Login user password.
+|
+|`+true+`
+
+|===

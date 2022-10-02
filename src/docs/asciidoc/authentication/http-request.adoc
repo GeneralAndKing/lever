@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+POST /authentication/token HTTP/1.1
+Accept: application/json, application/javascript, text/javascript, text/json
+Content-Type: application/json
+Host: localhost:55771
+Content-Length: 51
+
+{
+  "username" : "admin",
+  "password" : "123456"
+}
+----

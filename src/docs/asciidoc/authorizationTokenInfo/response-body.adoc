@@ -1,0 +1,11 @@
+[source,json,options="nowrap"]
+----
+{
+  "subject" : "subject",
+  "username" : "admin",
+  "roles" : [ "PUBLIC" ],
+  "permissions" : {
+    "GET" : [ "/authorization/tokenInfo" ]
+  }
+}
+----

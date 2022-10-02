@@ -63,31 +63,33 @@ dependencyManagement {
   }
 }
 
-tasks.getByName<Test>("test") {
-  useJUnitPlatform()
-}
-
 tasks.test {
+  doFirst { delete(snippetsDir) }
   outputs.dir(snippetsDir)
+  useJUnitPlatform()
 }
 
 // https://github.com/spring-io/start.spring.io/issues/676#issuecomment-859641317
 tasks.asciidoctor {
-  dependsOn(tasks.withType<Test>())
-  inputs.dir(snippetsDir)
+  doFirst {
+    delete(outputDir)
+    copy {
+      from(snippetsDir)
+      into(sourceDir)
+    }
+  }
+  dependsOn(tasks.test)
   configurations(asciidoctorExtensions.name)
+  setOutputDir(file("src/main/resources/static/docs"))
   attributes(
-    mapOf("snippets" to snippetsDir)
+    mapOf(
+      "snippets" to snippetsDir,
+      "source-highlighter" to "highlight.js"
+    )
   )
 }
 
-tasks.register<Copy>("apiDocument") {
-  group = "documentation"
-  from(tasks.asciidoctor.get().outputDir)
-  into("src/main/resources/static/docs")
-}
-
 tasks.bootJar {
-  dependsOn(tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask>())
+  dependsOn(tasks.asciidoctor)
   dependsOn(tasks.withType<Copy>())
 }

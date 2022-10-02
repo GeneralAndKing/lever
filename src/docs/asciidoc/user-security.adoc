@@ -1,0 +1,22 @@
+= User Security Api
+Andy Wilkinson;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[overview]]
+= Overview
+
+These APIs are used for authentication and authorization. Return link:index.html[Index].
+
+[[overview_authentication]]
+== Authentication
+
+operation::authentication[snippets='curl-request,request-fields,request-body,response-fields,response-body,httpie-request,http-request,http-response']
+
+== Get Authentication User Info
+
+operation::authorizationTokenInfo[snippets='curl-request,request-headers,response-fields,response-body,http-response']

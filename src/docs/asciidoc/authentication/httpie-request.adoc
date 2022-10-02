@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ echo '{
+  "username" : "admin",
+  "password" : "123456"
+}' | http POST 'http://localhost:55771/authentication/token' \
+    'Accept:application/json, application/javascript, text/javascript, text/json' \
+    'Content-Type:application/json'
+----

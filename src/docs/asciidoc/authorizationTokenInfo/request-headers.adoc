@@ -1,0 +1,8 @@
+[%autowidth.stretch,stripes=hover]
+|===
+|Name|Description
+
+|`+Authorization+`
+|Basic auth credentials.
+
+|===

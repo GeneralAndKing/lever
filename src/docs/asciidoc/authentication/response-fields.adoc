@@ -1,0 +1,21 @@
+[%autowidth.stretch,stripes=hover]
+|===
+|Path|Type|Description
+
+|`+subject+`
+|`+String+`
+|User unique identification.
+
+|`+username+`
+|`+String+`
+|Login user name.
+
+|`+accessToken+`
+|`+String+`
+|User access token.
+
+|`+refreshToken+`
+|`+String+`
+|Obtain a new valid access token when the user access token expires, and the token should be long-lived. It won't include user information, To be increasing the security of user tokens and only one-time use.
+
+|===

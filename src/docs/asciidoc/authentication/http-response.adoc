@@ -1,0 +1,22 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json;charset=UTF-8
+Content-Length: 1295
+Date: Sun, 02 Oct 2022 16:30:33 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+
+{
+  "subject" : "subject",
+  "username" : "admin",
+  "accessToken" : "eyJraWQiOiIzYzhmMjM5MS04YzM0LTRjYjQtOWYwNy0xMWQ5M2M3ZWI2MzUiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzdWJqZWN0IiwibmJmIjoxNjY0NzI4MjMzLCJzdWJqZWN0Ijoic3ViamVjdCIsInBlcm1pc3Npb25zIjp7fSwicm9sZXMiOltdLCJpc3MiOiJsZXZlciIsImV4cCI6MTY2NDc3MTQzMywiaWF0IjoxNjY0NzI4MjMzLCJqdGkiOiJzdWJqZWN0IiwidXNlcm5hbWUiOiJhZG1pbiJ9.f8w2Me2liT6sLjQ17qwa435mRqoha0osH7pkGbU5-B5cVNRhW9jJbWZ34BAdDrPqh_M6_FeqX-T4W_ReGDAXJUDjWGV5c0wSUOqwdAuU8rDT-ooZqPsI44O9KcCoW32FAZi3SGFS6eRW5goiIoiW0VYnqQEFu2UMLjejtbzVpY_IUPdr8naSeX3E2qPL3BM3mskDGR9lwGcXX1MRjjK_WhYw0N5cAqtFVvrFN6gc5OmowfLF2c-yqWFj5TpwR0ehAczbk8RRT-f6mxcQpgDR3qHzy8nUIYglIHNF6U9oIXYbiggxZ_FyYxCBxnXEqhJ_lVv5ZQK0Hf61ZTqbitpPyQ",
+  "refreshToken" : "eyJraWQiOiIzYzhmMjM5MS04YzM0LTRjYjQtOWYwNy0xMWQ5M2M3ZWI2MzUiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzdWJqZWN0IiwibmJmIjoxNjY0NzI4MjMzLCJpc3MiOiJsZXZlciIsImV4cCI6MTY2NTMzMzAzMywiaWF0IjoxNjY0NzI4MjMzLCJqdGkiOiJzdWJqZWN0In0.sJtMPwlMx2UoxvCo44BgpaGHfhLeOd2TU8ftULxoKP4gRuHxIeMwoDxDSNSP5hN0ig180iKbmjVxNUigXPX7pKe1rInaA1X9OV60DJsnr7WF9XmiMLtr1PxiwGGW8WHcmVI1liOBqSZR4eVAjtJglEU9HYyBSQQ37H-TqAdCcdI7-5_QtPSBxMAdcMBHjYq0yd7YZhXP_Vm47dBQDymYTgj-EK8tk32IqPV76dw5x0FvAIgRH0PjWB-bmV67nS8uRRAH9h7Ek05TTiCeW_W2ULG4AIg38sAFoqF0jTjosUnBv1oaLg8vR-ACuIU7LOXCvcoebqjD7rjgIG4Xs1I0pQ"
+}
+----
