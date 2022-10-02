@@ -1,0 +1,19 @@
+name: Run integration tests
+on: [push, pull_request]
+jobs:
+  run-integration-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+#        distribution: [ 'adopt', 'temurin', 'zulu' ]
+        distribution: [ 'adopt' ]
+        java: [ '17', '19' ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: ${{ matrix.distribution }}
+          java-version: ${{ matrix.java }}
+          cache: 'gradle'
+          check-latest: true
+      - run: ./gradlew asciidoctor
