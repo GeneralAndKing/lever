@@ -3,6 +3,8 @@ package wiki.lever;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import wiki.lever.context.DatabaseCacheContextHolder;
 
 /**
  * Application starter.
@@ -13,7 +15,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class LeverApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(LeverApplication.class, args);
+        ApplicationContext applicationContext = SpringApplication.run(LeverApplication.class, args);
+        DatabaseCacheContextHolder.setApplicationContext(applicationContext);
     }
 
 }

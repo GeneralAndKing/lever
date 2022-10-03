@@ -20,6 +20,6 @@ public interface SysUserRepository extends BaseRepository<SysUser> {
      * @param username login username
      * @return Optional of user
      */
-    Optional<SysUser> findByUsername(String username);
+    Optional<SysUser> findFirstByUsername(String username);
 
 }

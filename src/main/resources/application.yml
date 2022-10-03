@@ -9,6 +9,11 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  data:
+    redis:
+      password: lever@123456
+      host: 162.14.82.200
+      database: 0
 
 logging:
   level:

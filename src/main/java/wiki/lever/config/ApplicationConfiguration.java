@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -21,8 +22,9 @@ import java.util.Optional;
  *
  * @author yue
  */
-@Configuration
 @EnableAsync
+@EnableCaching
+@Configuration
 @EnableJpaAuditing
 @RequiredArgsConstructor
 @EnableConfigurationProperties({JwtProperties.class})

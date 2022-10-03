@@ -10,9 +10,6 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @author yue
  */
 @NoRepositoryBean
-public interface BaseRepository<E> extends JpaRepository<E, Long>, QuerydslPredicateExecutor<E> {
-
-
-
+public interface BaseRepository<E extends BaseEntity<E>> extends JpaRepository<E, Long>, QuerydslPredicateExecutor<E> {
 
 }

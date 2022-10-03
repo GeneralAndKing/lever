@@ -1,7 +1,9 @@
 package wiki.lever.config.security.authentication;
 
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.data.redis.core.RedisHash;
 import wiki.lever.config.security.JwtConfiguration;
 import wiki.lever.entity.SysUser;
 
@@ -26,6 +28,7 @@ import wiki.lever.entity.SysUser;
  */
 @Data
 @Accessors(chain = true)
+@RedisHash("user-token")
 public class UserToken {
 
     /**
@@ -33,6 +36,9 @@ public class UserToken {
      *
      * @see SysUser#getName()
      */
+    @Id
+    private String id;
+
     private String subject;
 
     /**

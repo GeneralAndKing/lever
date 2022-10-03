@@ -1,5 +1,6 @@
 package wiki.lever.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.http.HttpMethod;
 import wiki.lever.base.BaseEntity;
+import wiki.lever.entity.serialize.HttpMethodSerialize;
 
 import java.util.Objects;
 
@@ -34,6 +36,7 @@ import java.util.Objects;
 public class SysLog extends BaseEntity<SysLog> {
     private String className;
     private String methodName;
+    @JsonSerialize(using = HttpMethodSerialize.class)
     private HttpMethod httpMethod;
     private String paramContent;
     private String operateModule;

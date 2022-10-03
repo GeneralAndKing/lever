@@ -1,9 +1,9 @@
 package wiki.lever.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import wiki.lever.config.CacheConfiguration;
 import wiki.lever.modal.exception.SystemException;
 
 /**
@@ -22,7 +22,7 @@ public class JacksonUtil {
      */
     public static String toJson(Object obj) {
         try {
-            return new ObjectMapper().writeValueAsString(obj);
+            return CacheConfiguration.getGlobalObjectMapper().writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             throw new SystemException(e);
         }

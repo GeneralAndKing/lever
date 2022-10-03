@@ -36,12 +36,20 @@ public class BaseEntity<E extends BaseEntity<E>> {
     private String name;
 
     /**
-     * Entity enable.
+     * Entity delete status.
      */
     @Column(nullable = false)
     @Comment("Data deleted")
     @ColumnDefault("false")
     private Boolean deleted = Boolean.FALSE;
+
+    /**
+     * Entity enable.
+     */
+    @Column(nullable = false)
+    @Comment("Data enabled")
+    @ColumnDefault("true")
+    private Boolean enabled = Boolean.TRUE;
 
     /**
      * Create time
@@ -75,6 +83,11 @@ public class BaseEntity<E extends BaseEntity<E>> {
      * Remark information.
      */
     private String remark;
+
+    /**
+     * Sort data.
+     */
+    private Integer sort = 0;
 
     public Long getId() {
         return id;
@@ -145,6 +158,24 @@ public class BaseEntity<E extends BaseEntity<E>> {
 
     public E setRemark(String remark) {
         this.remark = remark;
+        return (E) this;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public E setSort(Integer sort) {
+        this.sort = sort;
+        return (E) this;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public E setEnabled(Boolean enabled) {
+        this.enabled = enabled;
         return (E) this;
     }
 }

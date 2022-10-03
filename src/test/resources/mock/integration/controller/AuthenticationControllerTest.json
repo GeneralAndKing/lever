@@ -18,6 +18,33 @@
     ]
   },
   {
+    "method": "userLoginSuccessFromCacheTest",
+    "data": [
+      {
+        "entity": "wiki.lever.entity.SysUser",
+        "data": [
+          {
+            "name": "subject",
+            "username": "admin",
+            "password": "{bcrypt}$2a$10$0nTEUHnMVxJJfWh/TEO2y.HmR9QmHki7I.5RPsf6KHSZG91Ky9qfG",
+            "phone": "13712341234",
+            "email": "yue@132.com",
+            "roles": []
+          }
+        ]
+      },
+      {
+        "entity": "wiki.lever.entity.GlobalConfig",
+        "data": [
+          {
+            "key": "authentication_once",
+            "value": "false"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "method": "authorizationTokenInfoSuccessTest",
     "data": [
       {

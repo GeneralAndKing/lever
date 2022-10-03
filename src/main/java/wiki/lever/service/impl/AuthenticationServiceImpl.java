@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,16 @@ import wiki.lever.entity.QSysRole;
 import wiki.lever.entity.SysPermission;
 import wiki.lever.entity.SysUser;
 import wiki.lever.repository.SysUserRepository;
+import wiki.lever.repository.cache.UserTokenRepository;
 import wiki.lever.service.AuthenticationService;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static wiki.lever.context.DatabaseCacheContextHolder.GlobalConfigHolder.getBoolean;
+import static wiki.lever.modal.constant.GlobalConfigKey.AUTHENTICATION_ONCE;
 
 /**
  * 2022/9/3 14:43:47
@@ -38,14 +41,16 @@ import java.util.stream.Collectors;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final SysUserRepository sysUserRepository;
+    private final UserTokenRepository userTokenRepository;
     private final JPAQueryFactory jpaQueryFactory;
     private final JwtEncoder jwtEncoder;
+    private final JwtDecoder jwtDecoder;
     private final JwtProperties jwtProperties;
 
     @Override
     @Transactional(rollbackOn = Exception.class)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        SysUser sysUser = sysUserRepository.findByUsername(username)
+        SysUser sysUser = sysUserRepository.findFirstByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Can not find user: " + username));
         return sysUser.setPermissions(getPermissions(sysUser));
     }
@@ -73,31 +78,49 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public UserToken buildToken(SysUser user) {
+        Instant now = Instant.now();
+        UserToken userToken = generateNewUserToken(user, now);
+        Optional<UserToken> existTokenOptional = userTokenRepository.findById(user.getName());
+        Boolean onlyOnceOrNoCache = getBoolean(AUTHENTICATION_ONCE) || existTokenOptional.isEmpty();
+        if (Boolean.TRUE.equals(onlyOnceOrNoCache)) {
+            userTokenRepository.deleteById(user.getName());
+            userTokenRepository.save(userToken);
+            return userToken;
+        }
+        UserToken existToken = existTokenOptional.get();
+        Instant expiresAt = jwtDecoder.decode(existToken.getRefreshToken()).getExpiresAt();
+        if (Objects.isNull(expiresAt) || expiresAt.isBefore(now)) {
+            userTokenRepository.deleteById(user.getName());
+            userTokenRepository.save(userToken);
+            return userToken;
+        }
+        return existToken;
+    }
+
+    private UserToken generateNewUserToken(SysUser user, Instant now) {
         return new UserToken()
-                .setAccessToken(buildUserAccessToken(user))
-                .setRefreshToken(buildUserRefreshToken(user))
+                .setAccessToken(buildAccessToken(user, now))
+                .setRefreshToken(buildRefreshToken(user, now))
+                .setId(user.getName())
                 .setSubject(user.getName())
                 .setUsername(user.getUsername());
     }
 
-    public String buildUserAccessToken(SysUser user) {
-        Instant now = Instant.now();
-        Instant expires = now.plus(jwtProperties.getAccessTokenExpiresTime(), jwtProperties.getAccessTokenExpiresUnit());
-        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
-                .subject(user.getName())
-                .issuer(jwtProperties.getIssuer())
-                .issuedAt(now)
-                .expiresAt(expires)
-                .notBefore(now)
-                .id(user.getName())
-                .claims(claim -> claim.putAll(buildTokenInfo(user)))
-                .build();
-        return jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
+    private String buildRefreshToken(SysUser user, Instant now) {
+        return buildToken(user, now,
+                now.plus(jwtProperties.getRefreshTokenExpiresTime(), jwtProperties.getRefreshTokenExpiresUnit()),
+                claim -> claim.putAll(Collections.emptyMap())
+        );
     }
 
-    private String buildUserRefreshToken(SysUser user) {
-        Instant now = Instant.now();
-        Instant expires = now.plus(jwtProperties.getRefreshTokenExpiresTime(), jwtProperties.getRefreshTokenExpiresUnit());
+    private String buildAccessToken(SysUser user, Instant now) {
+        return buildToken(user, now,
+                now.plus(jwtProperties.getAccessTokenExpiresTime(), jwtProperties.getAccessTokenExpiresUnit()),
+                claim -> claim.putAll(buildTokenInfo(user))
+        );
+    }
+
+    private String buildToken(SysUser user, Instant now, Instant expires, Consumer<Map<String, Object>> claimsConsumer) {
         JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
                 .subject(user.getName())
                 .issuer(jwtProperties.getIssuer())
@@ -105,6 +128,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .expiresAt(expires)
                 .notBefore(now)
                 .id(user.getName())
+                .claims(claimsConsumer)
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
     }

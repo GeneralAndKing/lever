@@ -68,11 +68,6 @@ public class SysUser extends BaseEntity<SysUser> implements UserDetails {
     private Boolean locked = Boolean.FALSE;
 
     /**
-     * User account is enabled.
-     */
-    private Boolean enabled = Boolean.TRUE;
-
-    /**
      * Associated roles
      */
     @ToString.Exclude
@@ -126,7 +121,7 @@ public class SysUser extends BaseEntity<SysUser> implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return getEnabled();
     }
 
     @Override

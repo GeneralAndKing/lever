@@ -1,14 +1,21 @@
 package wiki.lever.integration.controller;
 
 import org.apache.http.HttpHeaders;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import wiki.lever.config.security.SecurityConstant;
 import wiki.lever.config.security.authentication.UserToken;
 import wiki.lever.integration.DatasourceMockData;
+import wiki.lever.repository.cache.UserTokenRepository;
+
+import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
@@ -24,6 +31,9 @@ import static wiki.lever.integration.util.FieldConstraint.*;
 @DatasourceMockData
 class AuthenticationControllerTest extends AbstractControllerTest {
 
+    @Autowired
+    private UserTokenRepository userTokenRepository;
+
     @Test
     void userLoginSuccessTest() {
         given(super.spec)
@@ -32,6 +42,8 @@ class AuthenticationControllerTest extends AbstractControllerTest {
                         fieldWithPath(LoginParam.USERNAME).type(STRING).description(LoginParam.USERNAME_DESCRIPTION).attributes(REQUIRE),
                         fieldWithPath(LoginParam.PASSWORD).type(STRING).description(LoginParam.PASSWORD_DESCRIPTION).attributes(REQUIRE)
                 ), responseFields(
+                        fieldWithPath(LoginParam.ID).type(STRING).description(LoginParam.ID_DESCRIPTION),
+                        fieldWithPath(LoginParam.SUBJECT).type(STRING).description(LoginParam.SUBJECT_DESCRIPTION),
                         fieldWithPath(LoginParam.SUBJECT).type(STRING).description(LoginParam.SUBJECT_DESCRIPTION),
                         fieldWithPath(LoginParam.USERNAME).type(STRING).description(LoginParam.USERNAME_DESCRIPTION),
                         fieldWithPath(LoginParam.ACCESS_TOKEN).type(STRING).description(LoginParam.ACCESS_TOKEN_DESCRIPTION),
@@ -43,6 +55,44 @@ class AuthenticationControllerTest extends AbstractControllerTest {
                 .body(LoginParam.USERNAME, notNullValue())
                 .body(LoginParam.ACCESS_TOKEN, notNullValue())
                 .body(LoginParam.REFRESH_TOKEN, notNullValue());
+    }
+
+    @Test
+    @DatasourceMockData("userLoginSuccessTest")
+    void userLoginSuccessCacheTest() {
+        UserToken admin = given(super.spec)
+                .body(new LoginParam("admin", "123456"))
+                .when().post(SecurityConstant.AUTHENTICATION_URL)
+                .then().statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(UserToken.class);
+        Optional<UserToken> adminTokenOptional = userTokenRepository.findById(admin.getSubject());
+        assertTrue(adminTokenOptional.isPresent());
+        assertEquals(admin.getSubject(), adminTokenOptional.get().getSubject());
+    }
+
+    @Test
+    void userLoginSuccessFromCacheTest() {
+        UserToken admin = given(super.spec)
+                .body(new LoginParam("admin", "123456"))
+                .when().post(SecurityConstant.AUTHENTICATION_URL)
+                .then().statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(UserToken.class);
+        Optional<UserToken> adminTokenOptional = userTokenRepository.findById(admin.getSubject());
+        Assertions.assertTrue(adminTokenOptional.isPresent());
+        assertEquals(admin.getSubject(), adminTokenOptional.get().getSubject());
+
+        UserToken userToken = given(super.spec)
+                .body(new LoginParam("admin", "123456"))
+                .when().post(SecurityConstant.AUTHENTICATION_URL)
+                .then().statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(UserToken.class);
+        assertEquals(admin.getId(), userToken.getId());
+        assertEquals(admin.getSubject(), userToken.getSubject());
+        assertEquals(admin.getAccessToken(), userToken.getAccessToken());
+        assertEquals(admin.getRefreshToken(), userToken.getRefreshToken());
     }
 
     @Test
@@ -112,6 +162,8 @@ record LoginParam(String username, String password) {
     static final String USERNAME_DESCRIPTION = "Login user name.";
     static final String PASSWORD = "password";
     static final String PASSWORD_DESCRIPTION = "Login user password.";
+    static final String ID = "id";
+    static final String ID_DESCRIPTION = "User unique identification.";
     static final String SUBJECT = "subject";
     static final String SUBJECT_DESCRIPTION = "User unique identification.";
     static final String ACCESS_TOKEN = "accessToken";
