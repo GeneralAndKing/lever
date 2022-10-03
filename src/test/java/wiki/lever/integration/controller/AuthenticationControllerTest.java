@@ -46,6 +46,25 @@ class AuthenticationControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void userLoginErrorMethodTest() {
+        given(super.spec)
+                .body(new LoginParam("admin", "123456"))
+                .when().get(SecurityConstant.AUTHENTICATION_URL)
+                .then().statusCode(HttpStatus.UNAUTHORIZED.value())
+                .body(ERROR_DESCRIPTION, containsString("Authentication method not supported"));
+    }
+
+    @Test
+    void userLoginErrorRequestBodyTest() {
+        given(super.spec)
+                .formParam("username", "admin")
+                .formParam("password", "123456")
+                .when().post(SecurityConstant.AUTHENTICATION_URL)
+                .then().statusCode(HttpStatus.UNAUTHORIZED.value())
+                .body(ERROR_DESCRIPTION, containsString("Authentication request parse error, please use Json body"));
+    }
+
+    @Test
     void userLoginFailTest() {
         given(super.spec)
                 .body(new LoginParam("admin", "error"))
@@ -72,7 +91,7 @@ class AuthenticationControllerTest extends AbstractControllerTest {
                         fieldWithPath(LoginParam.USERNAME).description(LoginParam.USERNAME_DESCRIPTION),
                         fieldWithPath("roles").type(ARRAY).description("User current roles array."),
                         fieldWithPath("permissions").type(OBJECT).description("User roles' permissions. Has `GET`, `POST`, `PUT`, `PATCH`, `DELETE`."),
-                        subsectionWithPath("permissions.*").type(ARRAY).description("Current method path array.")
+                        subsectionWithPath("permissions.*").type(ARRAY).description("Current method path array. Include `[GET|POST|PUT|PATCH|DELETE]`")
                 )))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getAccessToken())
                 .when().get("/authorization/tokenInfo")
