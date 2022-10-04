@@ -1,7 +1,7 @@
 plugins {
   idea
   id("java")
-  id("io.spring.dependency-management") version "1.0.13.RELEASE"
+  id("io.spring.dependency-management") version "1.0.14.RELEASE"
   id("org.springframework.boot") version "3.0.0-M5"
   id("org.asciidoctor.jvm.convert") version "3.3.2"
 }
