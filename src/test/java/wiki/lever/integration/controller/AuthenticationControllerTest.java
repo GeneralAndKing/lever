@@ -140,8 +140,9 @@ class AuthenticationControllerTest extends AbstractControllerTest {
                         fieldWithPath(LoginParam.SUBJECT).description(LoginParam.SUBJECT_DESCRIPTION),
                         fieldWithPath(LoginParam.USERNAME).description(LoginParam.USERNAME_DESCRIPTION),
                         fieldWithPath("roles").type(ARRAY).description("User current roles array."),
-                        fieldWithPath("permissions").type(OBJECT).description("User roles' permissions. Has `GET`, `POST`, `PUT`, `PATCH`, `DELETE`."),
-                        subsectionWithPath("permissions.*").type(ARRAY).description("Current method path array. Include `[GET|POST|PUT|PATCH|DELETE]`")
+                        fieldWithPath("permissions").type(ARRAY).description("User roles' permissions. Has `GET`, `POST`, `PUT`, `PATCH`, `DELETE`."),
+                        subsectionWithPath("permissions[].method").type(STRING).description("Current method path array. Include `[GET|POST|PUT|PATCH|DELETE]`"),
+                        subsectionWithPath("permissions[].path").type(STRING).description("Current mapping path array.")
                 )))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + admin.getAccessToken())
                 .when().get("/authorization/tokenInfo")
@@ -151,9 +152,9 @@ class AuthenticationControllerTest extends AbstractControllerTest {
                 .body(LoginParam.USERNAME, equalTo(user.username()))
                 .body("roles", hasSize(1))
                 .body("roles[0]", equalTo("PUBLIC"))
-                .body("permissions", notNullValue())
-                .body("permissions.GET", hasSize(1))
-                .body("permissions.GET[0]", equalTo("/authorization/tokenInfo"));
+                .body("permissions", hasSize(1))
+                .body("permissions[0].path", equalTo("/authorization/tokenInfo"))
+                .body("permissions[0].method", equalTo("GET"));
     }
 }
 

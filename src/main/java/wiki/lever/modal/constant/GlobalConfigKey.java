@@ -16,9 +16,13 @@ import org.apache.commons.lang3.StringUtils;
 @Accessors(chain = true, fluent = true)
 public enum GlobalConfigKey {
     /**
-     *
+     * Whether to allow users to log in in only one place.
      */
-    AUTHENTICATION_ONCE("true");
+    AUTHENTICATION_ONCE("true"),
+    /**
+     * Anonymous role name.
+     */
+    ANONYMOUS_ROLE_NAME("ROLE_ANONYMOUS");
 
 
     /**

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -45,18 +47,21 @@ public class SecurityConfiguration {
      */
     private final AuthenticationConfiguration authenticationConfiguration;
 
+    private final AuthorizationManager<RequestAuthorizationContext> permissionAuthorizationManager;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         UsernamePasswordTokenAuthenticationFilter authenticationFilter =
                 new UsernamePasswordTokenAuthenticationFilter(authenticationSuccessHandler, authenticationFailureHandler);
         authenticationFilter.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
-        TokenAuthenticationEntryPoint authenticationEntryPoint = new TokenAuthenticationEntryPoint();
-        TokenAccessDeniedHandler accessDeniedHandler = new TokenAccessDeniedHandler();
         return http
+                .authorizeHttpRequests(authorize ->
+                    authorize.anyRequest().access(permissionAuthorizationManager)
+                )
                 .csrf().disable()
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .oauth2ResourceServer(config -> config.authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler)
+                .oauth2ResourceServer(config -> config.authenticationEntryPoint(new TokenAuthenticationEntryPoint())
+                        .accessDeniedHandler(new TokenAccessDeniedHandler())
                         .jwt()
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

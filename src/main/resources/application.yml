@@ -14,7 +14,16 @@ spring:
       password: lever@123456
       host: 162.14.82.200
       database: 0
-
+      lettuce:
+        cluster:
+          refresh:
+            adaptive: true
+            period: 20
 logging:
   level:
     org.springframework.security: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

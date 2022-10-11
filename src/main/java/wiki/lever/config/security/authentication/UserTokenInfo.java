@@ -7,9 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.jwt.Jwt;
 import wiki.lever.entity.SysUser;
+import wiki.lever.entity.projection.PathPermissionProjection;
 
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +57,7 @@ public class UserTokenInfo {
      * @see wiki.lever.service.AuthenticationService#loadUserByUsername(String) set permissions
      * @see SysUser#getPermissions()
      */
-    private Map<HttpMethod, List<String>> permissions = Collections.emptyMap();
+    private List<PathPermissionProjection> permissions = Collections.emptyList();
 
     /**
      * Build token info from {@code JSONObject}.

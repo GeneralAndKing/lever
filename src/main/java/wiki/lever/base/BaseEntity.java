@@ -87,6 +87,7 @@ public class BaseEntity<E extends BaseEntity<E>> {
     /**
      * Sort data.
      */
+    @ColumnDefault("0")
     private Integer sort = 0;
 
     public Long getId() {

@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -50,6 +51,7 @@ public class SysPermission extends BaseEntity<SysPermission> {
     /**
      * Should security.
      */
+    @ColumnDefault("false")
     private Boolean security;
 
     /**

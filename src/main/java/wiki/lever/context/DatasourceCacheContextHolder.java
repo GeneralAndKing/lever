@@ -13,7 +13,7 @@ import wiki.lever.service.GlobalConfigService;
  * @author yue
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DatabaseCacheContextHolder {
+public class DatasourceCacheContextHolder {
 
     private static ApplicationContext applicationContext;
 
@@ -22,7 +22,7 @@ public class DatabaseCacheContextHolder {
     }
 
     public static void setApplicationContext(ApplicationContext applicationContext) {
-        DatabaseCacheContextHolder.applicationContext = applicationContext;
+        DatasourceCacheContextHolder.applicationContext = applicationContext;
     }
 
     /**

@@ -25,6 +25,7 @@ public final class SecurityConstant {
      * User authentication token url.
      */
     public static final String AUTHENTICATION_URL = "/authentication/token";
+    public static final String ANONYMOUS = "anonymous";
 
     /**
      * The first set the <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Content-Type">Http header Content-Type</a> to {@code application/json},

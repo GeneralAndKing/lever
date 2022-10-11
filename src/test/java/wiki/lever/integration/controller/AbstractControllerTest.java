@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import wiki.lever.integration.DataSourceInitializeListener;
 
@@ -25,6 +26,7 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
  */
 @ExtendWith(RestDocumentationExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(initializers = DataSourceInitializeListener.DataSourceInitializer.class)
 @TestExecutionListeners(
         listeners = DataSourceInitializeListener.class,
         mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS

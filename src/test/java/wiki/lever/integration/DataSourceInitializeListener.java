@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
@@ -16,7 +19,7 @@ import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import wiki.lever.base.BaseCacheRepository;
 import wiki.lever.base.BaseRepository;
-import wiki.lever.context.DatabaseCacheContextHolder;
+import wiki.lever.context.DatasourceCacheContextHolder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,9 +57,9 @@ record DatasourceData(String method, List<DatasourceRepository> data, List<Datas
 @Slf4j
 public class DataSourceInitializeListener extends AbstractTestExecutionListener {
 
-    private final RedisContainer redisContainer = new RedisContainer().withExposedPorts(6379);
+    private static final RedisContainer redisContainer = new RedisContainer().withExposedPorts(6379);
 
-    private final JdbcDatabaseContainer<?> datasourceContainer = new MySQLContainerProvider()
+    private static final JdbcDatabaseContainer<?> datasourceContainer = new MySQLContainerProvider()
             .newInstance("latest");
 
 
@@ -64,14 +67,9 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
     public void beforeTestClass(@NotNull TestContext testContext) {
         Startables.deepStart(redisContainer, datasourceContainer).join();
         ApplicationContext applicationContext = testContext.getApplicationContext();
-        DatabaseCacheContextHolder.setApplicationContext(applicationContext);
+        DatasourceCacheContextHolder.setApplicationContext(applicationContext);
         log.info("[integration] Mysql container init in {}:{}", datasourceContainer.getHost(), datasourceContainer.getFirstMappedPort());
         log.info("[integration] Redis container init in {}:{}", redisContainer.getHost(), redisContainer.getFirstMappedPort());
-        System.getProperties().setProperty("spring.data.redis.port", redisContainer.getFirstMappedPort().toString());
-        System.getProperties().setProperty("spring.data.redis.host", redisContainer.getHost());
-        System.getProperties().setProperty("spring.datasource.url", datasourceContainer.getJdbcUrl());
-        System.getProperties().setProperty("spring.datasource.username", datasourceContainer.getUsername());
-        System.getProperties().setProperty("spring.datasource.password", datasourceContainer.getPassword());
     }
 
     @Override
@@ -146,6 +144,18 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
         }
         if (datasourceContainer.isRunning()) {
             datasourceContainer.stop();
+        }
+    }
+
+    public static class DataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+            TestPropertyValues.of(
+                    "spring.datasource.url=" + datasourceContainer.getJdbcUrl(),
+                    "spring.datasource.username=" + datasourceContainer.getUsername(),
+                    "spring.datasource.password=" + datasourceContainer.getPassword(),
+                    "spring.data.redis.port=" + redisContainer.getFirstMappedPort().toString(),
+                    "spring.data.redis.host=" + redisContainer.getHost()
+            ).applyTo(configurableApplicationContext.getEnvironment());
         }
     }
 }

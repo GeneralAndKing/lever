@@ -37,7 +37,7 @@ public class CacheConfiguration {
         return builder -> builder
                 .cacheDefaults(RedisCacheConfiguration
                         .defaultCacheConfig()
-                        .entryTtl(Duration.ofSeconds(10))
+                        .entryTtl(Duration.ofMinutes(3))
                         .serializeKeysWith(fromSerializer(new StringRedisSerializer()))
                         .serializeValuesWith(fromSerializer(new Jackson2JsonRedisSerializer<>(GLOBAL_OBJECT_MAPPER, Object.class)))
                 );

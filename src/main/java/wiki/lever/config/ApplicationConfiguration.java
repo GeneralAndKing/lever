@@ -17,6 +17,8 @@ import wiki.lever.config.security.JwtProperties;
 import java.util.Objects;
 import java.util.Optional;
 
+import static wiki.lever.config.security.SecurityConstant.ANONYMOUS;
+
 /**
  * 2022/9/8 22:09:53
  *
@@ -48,7 +50,7 @@ public class ApplicationConfiguration {
         return () -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (Objects.isNull(authentication)) {
-                return Optional.of("anonymous");
+                return Optional.of(ANONYMOUS);
             }
             return Optional.ofNullable(authentication.getName());
         };

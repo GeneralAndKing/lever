@@ -3,7 +3,9 @@ package wiki.lever.config.security.authorization;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -13,10 +15,11 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import wiki.lever.config.security.authentication.UserTokenInfo;
+import wiki.lever.entity.projection.PathPermissionProjection;
+import wiki.lever.service.AuthorizationService;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -34,36 +37,60 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class PermissionAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 
+    private final AuthorizationService authorizationService;
+
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext requestAuthorizationContext) {
         Authentication authenticationDetail = authentication.get();
-        if (!(authenticationDetail instanceof JwtAuthenticationToken jwtAuthenticationToken)) {
-            log.debug("Current authentication information is not JwtAuthenticationToken.");
-            return new AuthorizationDecision(false);
+        if (authenticationDetail instanceof JwtAuthenticationToken jwtAuthenticationToken) {
+            log.debug("Current authentication information is JwtAuthenticationToken.");
+            return jwtAuthenticationCheck(jwtAuthenticationToken, requestAuthorizationContext.getRequest());
         }
-        // It must be Jwt.
-        Jwt principal = (Jwt) jwtAuthenticationToken.getPrincipal();
-        log.info("Access user {}.", principal.getSubject());
-        UserTokenInfo detail = UserTokenInfo.fromMap(principal.getClaims());
-        return new AuthorizationDecision(check(requestAuthorizationContext, detail));
+        if (authenticationDetail instanceof AnonymousAuthenticationToken) {
+            log.debug("Current authentication information is AnonymousAuthenticationToken.");
+            return anonymousAuthenticationCheck(requestAuthorizationContext.getRequest());
+        }
+        return new AuthorizationDecision(false);
+    }
+
+    /**
+     * Get anonymous permissions and check current request.
+     *
+     * @param request current request
+     * @return decision
+     */
+    private AuthorizationDecision anonymousAuthenticationCheck(HttpServletRequest request) {
+        return getAuthorizationDecision(request, authorizationService.anonymousPermission());
     }
 
     /**
      * Check current permission. It will get all permissions from {@link Jwt#getClaim(String)} with user detail field.
-     * Access depends on the {@link AntPathRequestMatcher#matcher(HttpServletRequest)}.
      *
-     * @param requestAuthorizationContext current request authorization context
-     * @param detail                      user Jwt token info
+     * @param jwtAuthenticationToken current user token information
+     * @param request                servlet request
      * @return whether current user can access
      */
-    private static boolean check(RequestAuthorizationContext requestAuthorizationContext, UserTokenInfo detail) {
-        Map<HttpMethod, List<String>> permissions = detail.getPermissions();
-        log.debug("Can access map {}.", permissions);
-        HttpServletRequest request = requestAuthorizationContext.getRequest();
-        HttpMethod httpMethod = HttpMethod.valueOf(request.getMethod());
-        return permissions.getOrDefault(httpMethod, Collections.emptyList()).stream()
-                .anyMatch(permission ->
-                        new AntPathRequestMatcher(permission, httpMethod.name()).matcher(request).isMatch());
+    private AuthorizationDecision jwtAuthenticationCheck(JwtAuthenticationToken jwtAuthenticationToken, HttpServletRequest request) {
+        Jwt principal = (Jwt) jwtAuthenticationToken.getPrincipal();
+        log.info("Access user {}.", principal.getSubject());
+        UserTokenInfo detail = UserTokenInfo.fromMap(principal.getClaims());
+        return getAuthorizationDecision(request, detail.getPermissions());
     }
 
+    /**
+     * Check access map. Access uri depends on the {@link AntPathRequestMatcher#matcher(HttpServletRequest)}.
+     *
+     * @param request     current request
+     * @param permissions current user's permissions
+     * @return decision
+     */
+    private AuthorizationDecision getAuthorizationDecision(HttpServletRequest request, List<PathPermissionProjection> permissions) {
+        log.debug("Can access map {}.", permissions);
+        HttpMethod httpMethod = HttpMethod.valueOf(request.getMethod());
+        Optional<PathPermissionProjection> projection =
+                Optional.ofNullable(IteratorUtils.find(permissions.listIterator(),
+                        permission -> new AntPathRequestMatcher(permission.getPath(), httpMethod.name())
+                                .matcher(request).isMatch()));
+        return new AuthorizationDecision(projection.isPresent());
+    }
 }

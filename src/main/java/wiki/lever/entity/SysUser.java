@@ -11,10 +11,10 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import wiki.lever.base.BaseEntity;
+import wiki.lever.entity.projection.PathPermissionProjection;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -84,7 +84,7 @@ public class SysUser extends BaseEntity<SysUser> implements UserDetails {
      * @see wiki.lever.service.AuthenticationService#buildToken(SysUser) set this field
      * @see wiki.lever.config.security.authorization.PermissionAuthorizationManager get this field
      */
-    private transient Map<HttpMethod, List<String>> permissions = Collections.emptyMap();
+    private transient List<PathPermissionProjection> permissions = Collections.emptyList();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
