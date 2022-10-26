@@ -1,6 +1,8 @@
 package wiki.lever.integration.controller;
 
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import wiki.lever.integration.DataSourceInitializeListener;
 
+import java.util.List;
+
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
@@ -24,6 +28,7 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
  *
  * @author yue
  */
+//@AutoConfigureRestDocs
 @ExtendWith(RestDocumentationExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = DataSourceInitializeListener.DataSourceInitializer.class)
@@ -44,6 +49,7 @@ public abstract class AbstractControllerTest {
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
                 .setPort(port)
+                .addFilters(List.of(new RequestLoggingFilter(), new ResponseLoggingFilter()))
                 .addFilter(
                         documentationConfiguration(restDocumentation)
                                 .operationPreprocessors()

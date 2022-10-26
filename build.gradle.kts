@@ -1,30 +1,48 @@
+import org.jetbrains.gradle.ext.compiler
+import org.jetbrains.gradle.ext.settings
+
 plugins {
   idea
   id("java")
-  id("io.spring.dependency-management") version "1.0.14.RELEASE"
-  id("org.springframework.boot") version "3.0.0-M5"
+  id("io.spring.dependency-management") version "1.1.0"
+  id("org.springframework.boot") version "3.0.0-RC1"
   id("org.asciidoctor.jvm.convert") version "3.3.2"
+  id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.6"
 }
 
 group = "wiki.lever"
 version = "1.0-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+}
 
 configurations {
   compileOnly {
     extendsFrom(configurations.annotationProcessor.get())
   }
 }
+idea {
+  project {
+    settings {
+      compiler {
+        javac {
+          javacAdditionalOptions += "-parameters"
+        }
+      }
+    }
+  }
+}
 
 repositories {
+  mavenCentral()
   maven { url = uri("https://maven.aliyun.com/nexus/content/groups/public/") }
   maven { url = uri("https://repo.spring.io/milestone") }
-  mavenCentral()
+  google()
 }
 
 val asciidoctorExtensions: Configuration by configurations.creating
-val testcontainersVersion by extra { "1.17.3" }
+val testcontainersVersion by extra { "1.17.5" }
 val snippetsDir by extra { file("build/generated-snippets") }
 extra["snippetsDir"] = file("build/generated-snippets")
 
@@ -51,10 +69,10 @@ dependencies {
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
   testCompileOnly("org.projectlombok:lombok")
   testAnnotationProcessor("org.projectlombok:lombok")
+  testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("org.springframework.restdocs:spring-restdocs-restassured")
-  testImplementation("org.testcontainers:junit-jupiter")
   testImplementation("org.testcontainers:mysql")
 }
 
@@ -62,6 +80,11 @@ dependencyManagement {
   imports {
     mavenBom("org.testcontainers:testcontainers-bom:${testcontainersVersion}")
   }
+}
+
+
+tasks.withType<JavaCompile> {
+  options.compilerArgs.addAll(listOf("-parameters"))
 }
 
 tasks.test {

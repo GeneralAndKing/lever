@@ -111,7 +111,7 @@ public class DataSourceInitializeListener extends AbstractTestExecutionListener 
      * @return name
      */
     private CharSequence targetName(Method testMethod) {
-        DatasourceMockData datasourceMockData = testMethod.getAnnotation(DatasourceMockData.class);
+        DataSourceMockData datasourceMockData = testMethod.getAnnotation(DataSourceMockData.class);
         return Objects.isNull(datasourceMockData)
                 ? testMethod.getName()
                 : datasourceMockData.value();

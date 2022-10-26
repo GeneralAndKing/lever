@@ -15,6 +15,13 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DatasourceNoMockData {
+public @interface DataSourceMockData {
+
+    /**
+     * Mock file name, default current class name with json file.
+     *
+     * @return file name
+     */
+    String value() default "";
 
 }

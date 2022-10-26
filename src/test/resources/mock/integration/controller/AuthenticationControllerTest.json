@@ -38,7 +38,7 @@
         "data": [
           {
             "key": "authentication_once",
-            "value": "false"
+            "value": false
           }
         ]
       }

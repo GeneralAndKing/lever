@@ -94,8 +94,8 @@ public class DataSourceInitializeHanlder {
     /**
      * Check whether the current test method need to initialize the mock data.
      * <ul>
-     *     <li>The test class or test method don't have {@link DatasourceMockData}, no load.</li>
-     *     <li>The test class or test method have {@link DatasourceNoMockData}, no load.</li>
+     *     <li>The test class or test method don't have {@link DataSourceMockData}, no load.</li>
+     *     <li>The test class or test method have {@link DataSourceNoMockData}, no load.</li>
      * </ul>
      *
      * @param testMethod current test method
@@ -103,13 +103,13 @@ public class DataSourceInitializeHanlder {
      * @return do not load mock data if true.
      */
     public static Boolean noLoadMockData(Method testMethod, Class<?> testClass) {
-        DatasourceMockData methodMockData = testMethod.getAnnotation(DatasourceMockData.class);
-        DatasourceMockData classMockData = testClass.getAnnotation(DatasourceMockData.class);
+        DataSourceMockData methodMockData = testMethod.getAnnotation(DataSourceMockData.class);
+        DataSourceMockData classMockData = testClass.getAnnotation(DataSourceMockData.class);
         if (ObjectUtils.allNull(methodMockData, classMockData)) {
             return Boolean.TRUE;
         }
-        DatasourceNoMockData methodNoMockData = testMethod.getAnnotation(DatasourceNoMockData.class);
-        DatasourceNoMockData classNoMockData = testClass.getAnnotation(DatasourceNoMockData.class);
+        DataSourceNoMockData methodNoMockData = testMethod.getAnnotation(DataSourceNoMockData.class);
+        DataSourceNoMockData classNoMockData = testClass.getAnnotation(DataSourceNoMockData.class);
         if (ObjectUtils.anyNotNull(methodNoMockData, classNoMockData)) {
             return Boolean.TRUE;
         }
@@ -117,15 +117,15 @@ public class DataSourceInitializeHanlder {
     }
 
     /**
-     * Get mock data file name from {@link DatasourceMockData}.
+     * Get mock data file name from {@link DataSourceMockData}.
      * The default value is current test class name of json,
-     * you can custom name by {@link DatasourceMockData#value()}.
+     * you can custom name by {@link DataSourceMockData#value()}.
      *
      * @param testClass current test class
      * @return file path
      */
     public static String getMockDataFilePath(Class<?> testClass) {
-        DatasourceMockData datasourceMockData = testClass.getAnnotation(DatasourceMockData.class);
+        DataSourceMockData datasourceMockData = testClass.getAnnotation(DataSourceMockData.class);
         if (Objects.isNull(datasourceMockData)) {
             return null;
         }

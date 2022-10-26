@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import wiki.lever.config.security.SecurityConstant;
 import wiki.lever.config.security.authentication.UserToken;
-import wiki.lever.integration.DatasourceMockData;
+import wiki.lever.integration.DataSourceMockData;
 import wiki.lever.repository.cache.UserTokenRepository;
 
 import java.util.Optional;
@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static wiki.lever.integration.util.FieldConstraint.*;
@@ -28,7 +29,7 @@ import static wiki.lever.integration.util.FieldConstraint.*;
  *
  * @author yue
  */
-@DatasourceMockData
+@DataSourceMockData
 class AuthenticationControllerTest extends AbstractControllerTest {
 
     @Autowired
@@ -58,7 +59,7 @@ class AuthenticationControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @DatasourceMockData("userLoginSuccessTest")
+    @DataSourceMockData("userLoginSuccessTest")
     void userLoginSuccessCacheTest() {
         UserToken admin = given(super.spec)
                 .body(new LoginParam("admin", "123456"))
@@ -73,8 +74,9 @@ class AuthenticationControllerTest extends AbstractControllerTest {
 
     @Test
     void userLoginSuccessFromCacheTest() {
+        LoginParam loginParam = new LoginParam("admin", "123456");
         UserToken admin = given(super.spec)
-                .body(new LoginParam("admin", "123456"))
+                .body(loginParam)
                 .when().post(SecurityConstant.AUTHENTICATION_URL)
                 .then().statusCode(HttpStatus.OK.value())
                 .extract()
@@ -84,7 +86,7 @@ class AuthenticationControllerTest extends AbstractControllerTest {
         assertEquals(admin.getSubject(), adminTokenOptional.get().getSubject());
 
         UserToken userToken = given(super.spec)
-                .body(new LoginParam("admin", "123456"))
+                .body(loginParam)
                 .when().post(SecurityConstant.AUTHENTICATION_URL)
                 .then().statusCode(HttpStatus.OK.value())
                 .extract()
