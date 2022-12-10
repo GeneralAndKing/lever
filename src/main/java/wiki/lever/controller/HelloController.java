@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wiki.lever.modal.annotation.Log;
-import wiki.lever.repository.SysUserRepository;
+
+import java.util.List;
 
 /**
  * 2022/08/31 17:13:12
@@ -18,18 +19,16 @@ import wiki.lever.repository.SysUserRepository;
 @RequiredArgsConstructor
 public class HelloController {
 
-    private final SysUserRepository sysUserRepository;
-
     @GetMapping("/hello")
     @Log(operateModule = "业务", operateType = "测试", operateName = "你好")
-    public HttpEntity<?> hello(String param1, int param2) {
-        return ResponseEntity.ok(sysUserRepository.findAll());
+    public HttpEntity<String> hello(String param1, int param2) {
+        return ResponseEntity.ok(param1 + param2);
     }
 
     @PostMapping("/word")
     @Log(operateModule = "业务", operateType = "测试", operateName = "世界")
-    public HttpEntity<?> word() {
-        return ResponseEntity.ok(sysUserRepository.findAll());
+    public HttpEntity<List<String>> word() {
+        return ResponseEntity.ok(List.of("World"));
     }
 
 }
